@@ -7,6 +7,7 @@ public class Player : MonoBehaviour
     private Rigidbody2D _rigid;
 
     [SerializeField] private float _jumpForce, _moveSpeed;
+    private int _maxJumpCount = 1, _jumpCount = 1;
 
     private void Awake()
     {
@@ -15,11 +16,24 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
-        if(Input.GetButtonDown("Jump"))
+        if(Input.GetButton("Jump") && _jumpCount > 0)
         {
+            --_jumpCount;
             _rigid.AddForce(Vector2.up * _jumpForce, ForceMode2D.Impulse);
         }
 
         transform.position += Vector3.right * Input.GetAxisRaw("Horizontal") * Time.deltaTime * _moveSpeed;
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Platform") && transform.position.y > collision.GetContact(0).point.y)
+            _jumpCount = _maxJumpCount;
+    }
+
+    private void OnCollisionExit2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Platform"))
+            _jumpCount = 0;
     }
 }

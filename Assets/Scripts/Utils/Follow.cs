@@ -6,6 +6,7 @@ public class Follow : MonoBehaviour
 {
     [SerializeField] Transform _target;
     [SerializeField] private float _allowXDistance, _allowYDistance;
+    [SerializeField] private float _followSpeed;
     private Vector3 _offset;
 
     private void Awake()
@@ -17,15 +18,17 @@ public class Follow : MonoBehaviour
     {
         var idealPos = _target.position + _offset;
         var targetPos = transform.position;
+
         if (transform.position.x < idealPos.x - _allowXDistance)
             targetPos.x = idealPos.x - _allowXDistance;
         else if (transform.position.x > idealPos.x + _allowXDistance)
             targetPos.x = idealPos.x + _allowXDistance;
+
         if (transform.position.y < idealPos.y - _allowYDistance)
-            targetPos.y = idealPos.y - _allowXDistance;
-        else if (transform.position.y > idealPos.y +  _allowYDistance)
+            targetPos.y = idealPos.y - _allowYDistance;
+        else if (transform.position.y > idealPos.y + _allowYDistance)
             targetPos.y = idealPos.y + _allowYDistance;
 
-        transform.position = Vector3.Lerp(transform.position, targetPos, 5f * Time.deltaTime);
+        transform.position = Vector3.Lerp(transform.position, targetPos, _followSpeed * Time.deltaTime);
     }
 }
