@@ -19,7 +19,7 @@ public class Player : MonoBehaviour
         if(Input.GetButton("Jump") && _jumpCount > 0)
         {
             --_jumpCount;
-            _rigid.AddForce(Vector2.up * _jumpForce, ForceMode2D.Impulse);
+            _rigid.velocity = Vector2.up * _jumpForce;
         }
 
         transform.position += Vector3.right * Input.GetAxisRaw("Horizontal") * Time.deltaTime * _moveSpeed;
