@@ -6,7 +6,7 @@ public class Player : MonoBehaviour
 {
     private Rigidbody2D _rigid;
 
-    [SerializeField] private float _jumpForce, _moveSpeed;
+    [SerializeField] private float _jumpForce, _moveSpeed, _dashForce, _minGlidingVelY;
     private int _maxJumpCount = 2, _jumpCount = 2;
     private bool _isOnGround = false;
 
@@ -26,7 +26,25 @@ public class Player : MonoBehaviour
             Jump();
         }
 
-        transform.position += Vector3.right * Input.GetAxisRaw("Horizontal") * Time.deltaTime * _moveSpeed;
+        if(Input.GetKey(KeyCode.E))
+        {
+            var vel = _rigid.velocity;
+            if(vel.y < _minGlidingVelY)
+                vel.y = Mathf.Lerp(vel.y, _minGlidingVelY, 6f * Time.deltaTime);
+            _rigid.velocity = vel;
+
+            print("Gliding...");
+        }
+
+        var hor = Input.GetAxisRaw("Horizontal");
+
+        if (Input.GetKeyDown(KeyCode.R) && Mathf.Abs(hor) > Mathf.Epsilon)
+        {
+            print("Dash!!");
+            _rigid.AddForce(_dashForce * hor * Vector2.right, ForceMode2D.Impulse);
+        }
+
+        transform.position += _moveSpeed * hor * Time.deltaTime * Vector3.right;
     }
 
     private void Jump()
