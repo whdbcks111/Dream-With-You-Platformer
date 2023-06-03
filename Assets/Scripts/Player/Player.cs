@@ -46,7 +46,7 @@ public class Player : MonoBehaviour
             _rigid.AddForce(_dashForce * hor * Vector2.right, ForceMode2D.Impulse);
         }
 
-        transform.position += _moveSpeed * hor * Time.deltaTime * Vector3.right;
+        _rigid.velocity = _rigid.velocity * Vector2.up + _moveSpeed * hor * Vector2.right;
     }
 
     private void Jump()
@@ -63,6 +63,12 @@ public class Player : MonoBehaviour
             _isOnGround = true;
             _jumpCount = _maxJumpCount;
         }
+    }
+
+    private void OnCollisionStay2D(Collision2D collision)
+    {
+        if ((collision.gameObject.layer & platformLayer) != 0 && transform.position.y > collision.GetContact(0).point.y)
+            TilesManager.Instance.OnGroundCollision(collision);
     }
 
     private void OnCollisionExit2D(Collision2D collision)
