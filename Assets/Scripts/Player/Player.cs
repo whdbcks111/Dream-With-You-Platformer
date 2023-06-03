@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
+    private int platformLayer;
     private Rigidbody2D _rigid;
 
     [SerializeField] private float _jumpForce, _moveSpeed, _dashForce, _minGlidingVelY;
@@ -12,6 +13,7 @@ public class Player : MonoBehaviour
 
     private void Awake()
     {
+        platformLayer = LayerMask.NameToLayer("Platform");
         _rigid = GetComponent<Rigidbody2D>();
     }
 
@@ -55,7 +57,8 @@ public class Player : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.CompareTag("Platform") && transform.position.y > collision.GetContact(0).point.y)
+        
+        if ((collision.gameObject.layer & platformLayer) != 0 && transform.position.y > collision.GetContact(0).point.y)
         {
             _isOnGround = true;
             _jumpCount = _maxJumpCount;
@@ -64,7 +67,7 @@ public class Player : MonoBehaviour
 
     private void OnCollisionExit2D(Collision2D collision)
     {
-        if (collision.gameObject.CompareTag("Platform"))
+        if ((collision.gameObject.layer & platformLayer) != 0)
             _isOnGround = false;
     }
 }
