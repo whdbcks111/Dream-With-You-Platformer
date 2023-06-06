@@ -6,6 +6,7 @@ public class Player : MonoBehaviour
 {
     private int platformLayer;
     private Rigidbody2D _rigid;
+    private SpriteRenderer _spriteRenderer;
 
     [SerializeField] private float _jumpForce, _moveSpeed, _dashForce, _minGlidingVelY;
     private int _maxJumpCount = 2, _jumpCount = 2;
@@ -15,6 +16,7 @@ public class Player : MonoBehaviour
     {
         platformLayer = LayerMask.NameToLayer("Platform");
         _rigid = GetComponent<Rigidbody2D>();
+        _spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     private void Update()
@@ -39,12 +41,17 @@ public class Player : MonoBehaviour
         }
 
         var hor = Input.GetAxisRaw("Horizontal");
-
-        if (Input.GetKeyDown(KeyCode.R) && Mathf.Abs(hor) > Mathf.Epsilon)
+        
+        if (Mathf.Abs(hor) > Mathf.Epsilon)
         {
-            print("Dash!!");
-            _rigid.AddForce(_dashForce * hor * Vector2.right, ForceMode2D.Impulse);
+            if (Input.GetKeyDown(KeyCode.R))
+            {
+                print("Dash!!");
+                _rigid.AddForce(_dashForce * hor * Vector2.right, ForceMode2D.Impulse);
+            }
+            _spriteRenderer.flipX = hor < 0f;
         }
+        
 
         _rigid.velocity = _rigid.velocity * Vector2.up + _moveSpeed * hor * Vector2.right;
     }

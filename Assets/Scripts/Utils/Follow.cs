@@ -14,7 +14,7 @@ public class Follow : MonoBehaviour
         _offset = transform.position - _target.position;
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         var idealPos = _target.position + _offset;
         var targetPos = transform.position;
@@ -29,6 +29,6 @@ public class Follow : MonoBehaviour
         else if (transform.position.y > idealPos.y + _allowYDistance)
             targetPos.y = idealPos.y + _allowYDistance;
 
-        transform.position = Vector3.Lerp(transform.position, targetPos, _followSpeed * Time.deltaTime);
+        transform.position = Vector3.Lerp(transform.position, targetPos, _followSpeed * Time.fixedDeltaTime);
     }
 }

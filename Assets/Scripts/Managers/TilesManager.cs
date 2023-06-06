@@ -2,8 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
-using System.Linq;
-using static UnityEditor.PlayerSettings;
 
 public class TilesManager : MonoBehaviour
 {
@@ -24,28 +22,48 @@ public class TilesManager : MonoBehaviour
         Instance = this;
     }
 
+    private void Collapse(Vector3Int cellPos)
+    {
+        if (_collapseWaitSet.Contains(cellPos) || _collapseTilemap.GetTile(cellPos) is null) return;
+        Stack<Vector3Int> stack = new();
+        stack.Push(cellPos);
+
+        Vector3Int[] directions = { Vector3Int.up, Vector3Int.down, Vector3Int.left, Vector3Int.right };
+        
+        while(stack.Count > 0)
+        {
+            var p = stack.Pop();
+
+            _collapseWaitSet.Add(p);
+            StartCoroutine(CollapseRoutine(p));
+
+            foreach(var dir in directions)
+            {
+                var child = p + dir;
+                if (!_collapseWaitSet.Contains(child) && _collapseTilemap.GetTile(child) is not null)
+                {
+                    stack.Push(child);
+                }
+            }
+            
+        }
+        
+    }
+
     public void OnGroundCollision(Collision2D collision)
     {
         if(collision.gameObject == _collapseTilemap.gameObject)
         {
-
             foreach(var contact in collision.contacts)
             {
                 if (contact.point.y >= collision.otherCollider.transform.position.y) continue;
-                for(var xOffset = -1; xOffset <= 1; xOffset ++)
-                {
-                    var pos = contact.point + xOffset * 0.1f * Vector2.right - collision.GetContact(0).normal * 0.3f;
-                    Vector3Int cellPos = _collapseTilemap.WorldToCell(pos);
-                    if (!_collapseWaitSet.Contains(cellPos))
-                    {
-                        StartCoroutine(CollapseRoutine(cellPos));
-                    }
+                var pos = contact.point - collision.GetContact(0).normal * 0.4f;
+                Vector3Int cellPos = _collapseTilemap.WorldToCell(pos);
 
-                } 
+                Collapse(cellPos);
             }
-            
         }
-        else if(collision.gameObject == _forceJumpTilemap.gameObject)
+        else if (collision.gameObject == _forceJumpTilemap.gameObject)
         {
             collision.otherRigidbody.velocity = _forceJumpForce * Vector2.up;
         }
@@ -54,8 +72,7 @@ public class TilesManager : MonoBehaviour
     private IEnumerator CollapseRoutine(Vector3Int pos)
     {
         var tile = _collapseTilemap.GetTile(pos);
-        print(pos);
-        _collapseWaitSet.Add(pos);
+
         for (float timer = 0f; timer < _collapseTime; timer += Time.deltaTime)
         {
             yield return null;
