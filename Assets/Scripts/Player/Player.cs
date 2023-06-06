@@ -58,6 +58,7 @@ public class Player : MonoBehaviour
         _rigid.velocity = _rigid.velocity * Vector2.up + _moveSpeed * hor * Vector2.right;
         if((_dashTimer -= Time.deltaTime) > 0f)
         {
+            if (_dashDir * hor < 0) _dashTimer = 0f;
             _rigid.velocity = Vector2.right * _dashDir;
         }
     }
