@@ -8,9 +8,10 @@ public class Player : MonoBehaviour
     private Rigidbody2D _rigid;
     private SpriteRenderer _spriteRenderer;
 
-    [SerializeField] private float _jumpForce, _moveSpeed, _dashForce, _minGlidingVelY;
+    [SerializeField] private float _jumpForce, _moveSpeed, _dashForce, _minGlidingVelY, _dashTime;
     private int _maxJumpCount = 2, _jumpCount = 2;
     private bool _isOnGround = false;
+    private float _dashTimer = 0f, _dashDir;
 
     private void Awake()
     {
@@ -30,7 +31,7 @@ public class Player : MonoBehaviour
             Jump();
         }
 
-        if(Input.GetKey(KeyCode.E))
+        if(Input.GetKey(KeyCode.LeftShift))
         {
             var vel = _rigid.velocity;
             if(vel.y < _minGlidingVelY)
@@ -44,16 +45,21 @@ public class Player : MonoBehaviour
         
         if (Mathf.Abs(hor) > Mathf.Epsilon)
         {
-            if (Input.GetKeyDown(KeyCode.R))
+            if (Input.GetKeyDown(KeyCode.Return))
             {
                 print("Dash!!");
-                _rigid.AddForce(_dashForce * hor * Vector2.right, ForceMode2D.Impulse);
+                _dashTimer = _dashTime;
+                _dashDir = hor * _dashForce;
             }
             _spriteRenderer.flipX = hor < 0f;
         }
         
 
         _rigid.velocity = _rigid.velocity * Vector2.up + _moveSpeed * hor * Vector2.right;
+        if((_dashTimer -= Time.deltaTime) > 0f)
+        {
+            _rigid.velocity = Vector2.right * _dashDir;
+        }
     }
 
     private void Jump()

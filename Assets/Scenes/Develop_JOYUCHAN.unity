@@ -686,9 +686,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _jumpForce: 19
-  _moveSpeed: 5
-  _dashForce: 15
+  _moveSpeed: 7
+  _dashForce: 25
   _minGlidingVelY: -2.5
+  _dashTime: 0.3
 --- !u!1 &412054568
 GameObject:
   m_ObjectHideFlags: 0
