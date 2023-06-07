@@ -50,13 +50,13 @@ public class TilesManager : MonoBehaviour
         
     }
 
-    public void OnGroundCollision(Collision2D collision)
+    public void OnGroundCollision(Player player, Collision2D collision)
     {
         if(collision.gameObject == _collapseTilemap.gameObject)
         {
             foreach(var contact in collision.contacts)
             {
-                if (contact.point.y >= collision.otherCollider.transform.position.y) continue;
+                if (contact.point.y >= player.transform.position.y) continue;
                 var pos = contact.point - collision.GetContact(0).normal * 0.4f;
                 Vector3Int cellPos = _collapseTilemap.WorldToCell(pos);
 
@@ -65,7 +65,7 @@ public class TilesManager : MonoBehaviour
         }
         else if (collision.gameObject == _forceJumpTilemap.gameObject)
         {
-            collision.otherRigidbody.velocity = _forceJumpForce * Vector2.up;
+            player.Jump(_forceJumpForce);
         }
     }
 

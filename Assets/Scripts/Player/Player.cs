@@ -8,16 +8,18 @@ public class Player : MonoBehaviour
     private Rigidbody2D _rigid;
     private SpriteRenderer _spriteRenderer;
 
-    [SerializeField] private float _jumpForce, _moveSpeed, _dashForce, _minGlidingVelY, _dashTime;
+    [SerializeField] private float _jumpForce, _moveSpeed, _dashForce, _glidDrag, _dashTime;
     private int _maxJumpCount = 2, _jumpCount = 2;
     private bool _isOnGround = false;
     private float _dashTimer = 0f, _dashDir;
+    private float _originalDrag;
 
     private void Awake()
     {
         platformLayer = LayerMask.NameToLayer("Platform");
         _rigid = GetComponent<Rigidbody2D>();
         _spriteRenderer = GetComponent<SpriteRenderer>();
+        _originalDrag = _rigid.drag;
     }
 
     private void Update()
@@ -31,15 +33,7 @@ public class Player : MonoBehaviour
             Jump();
         }
 
-        if(Input.GetKey(KeyCode.LeftShift))
-        {
-            var vel = _rigid.velocity;
-            if(vel.y < _minGlidingVelY)
-                vel.y = Mathf.Lerp(vel.y, _minGlidingVelY, 6f * Time.deltaTime);
-            _rigid.velocity = vel;
-
-            print("Gliding...");
-        }
+        _rigid.drag = Input.GetKey(KeyCode.LeftShift) ? _glidDrag : _originalDrag;
 
         var hor = Input.GetAxisRaw("Horizontal");
         
@@ -47,7 +41,6 @@ public class Player : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.Return))
             {
-                print("Dash!!");
                 _dashTimer = _dashTime;
                 _dashDir = hor * _dashForce;
             }
@@ -63,10 +56,15 @@ public class Player : MonoBehaviour
         }
     }
 
-    private void Jump()
+    public void Jump(float force)
     {
         --_jumpCount;
-        _rigid.velocity = Vector2.up * _jumpForce;
+        _rigid.velocity = Vector2.up * force;
+    }
+
+    public void Jump()
+    {
+        Jump(_jumpForce);
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -82,7 +80,7 @@ public class Player : MonoBehaviour
     private void OnCollisionStay2D(Collision2D collision)
     {
         if ((collision.gameObject.layer & platformLayer) != 0 && transform.position.y > collision.GetContact(0).point.y)
-            TilesManager.Instance.OnGroundCollision(collision);
+            TilesManager.Instance.OnGroundCollision(this, collision);
     }
 
     private void OnCollisionExit2D(Collision2D collision)
