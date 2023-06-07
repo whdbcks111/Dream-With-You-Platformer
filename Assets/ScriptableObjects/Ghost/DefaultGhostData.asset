@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a718c72cdcabde469bf3706a6a1096b, type: 3}
   m_Name: DefaultGhostData
   m_EditorClassIdentifier: 
-  _moveSpeed: 0
+  _moveSpeed: 2

@@ -4,61 +4,24 @@ using UnityEngine;
 
 public class Ghost : MonoBehaviour
 {
-    float rightMax = 18.0f; //좌로 이동가능한 (x)최대값
-    float leftMax = 14.0f; //우로 이동가능한 (x)최대값
-    float currentPosition; //현재 위치(x) 저장
-    float direction = 3.0f; //이동속도+방향
+    [SerializeField] private float _leftMax, _rightMax;
+    [SerializeField] private GhostData _data;
+    private Vector3 _originalPosition;
+    private int _direction = 1;
 
-
-
-    void Start()
-
+    private void Awake()
     {
-
-        currentPosition = transform.position.x;
-        print(currentPosition);
+        _originalPosition = transform.position;
     }
 
-
-
-
-    void Update()
-
+    private void Update()
     {
-
-        currentPosition += Time.deltaTime * direction;
-
-        if (currentPosition >= rightMax)
-
+        if(transform.position.x>= _originalPosition.x + _rightMax ||
+            transform.position.x <= _originalPosition.x - _leftMax)
         {
-
-            direction *= -1;
-
-            currentPosition = rightMax;
-
+            _direction *= -1;
         }
 
-        //현재 위치(x)가 우로 이동가능한 (x)최대값보다 크거나 같다면
-
-        //이동속도+방향에 -1을 곱해 반전을 해주고 현재위치를 우로 이동가능한 (x)최대값으로 설정
-
-        else if (currentPosition <= leftMax)
-
-        {
-
-            direction *= -1;
-
-            currentPosition = leftMax;
-
-        }
-
-        //현재 위치(x)가 좌로 이동가능한 (x)최대값보다 크거나 같다면
-
-        //이동속도+방향에 -1을 곱해 반전을 해주고 현재위치를 좌로 이동가능한 (x)최대값으로 설정
-
-        transform.position = new Vector3(currentPosition, 0, 0);
-
-        //"Stone"의 위치를 계산된 현재위치로 처리
-
+        transform.position += _direction * _data.MoveSpeed * Time.deltaTime * Vector3.right; //최적화를 위한 코드
     }
 }
