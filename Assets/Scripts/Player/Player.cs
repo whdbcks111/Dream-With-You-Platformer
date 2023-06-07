@@ -79,6 +79,14 @@ public class Player : MonoBehaviour
         //Not Implemented
     }
 
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.gameObject.CompareTag("Enemy"))
+        {
+            Sleep();
+        }
+    }
+
     private void OnCollisionEnter2D(Collision2D collision)
     {
         
@@ -87,8 +95,7 @@ public class Player : MonoBehaviour
             _isOnGround = true;
             _jumpCount = _maxJumpCount;
         }
-
-        else if(collision.gameObject.CompareTag("Enemy"))
+        else if (collision.gameObject.CompareTag("Enemy"))
         {
             Sleep();
         }
