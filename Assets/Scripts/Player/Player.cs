@@ -58,13 +58,24 @@ public class Player : MonoBehaviour
 
     public void Jump(float force)
     {
-        --_jumpCount;
+        print(--_jumpCount);
         _rigid.velocity = Vector2.up * force;
     }
 
     public void Jump()
     {
         Jump(_jumpForce);
+    }
+
+    public void Sleep()
+    {
+        StartCoroutine(SleepRoutine());
+    }
+
+    private IEnumerator SleepRoutine()
+    {
+        yield return null;
+        //Not Implemented
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -74,6 +85,11 @@ public class Player : MonoBehaviour
         {
             _isOnGround = true;
             _jumpCount = _maxJumpCount;
+        }
+
+        else if(collision.gameObject.CompareTag("Enemy"))
+        {
+            Sleep();
         }
     }
 
