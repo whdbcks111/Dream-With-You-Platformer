@@ -75,6 +75,7 @@ public class Player : MonoBehaviour
     private IEnumerator SleepRoutine()
     {
         yield return null;
+        print("Sleep...");
         //Not Implemented
     }
 
