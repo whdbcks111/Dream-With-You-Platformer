@@ -687,9 +687,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _jumpForce: 19
   _moveSpeed: 7
-  _dashForce: 25
+  _dashForce: 30
   _glidDrag: 3
-  _dashTime: 0.3
+  _dashTime: 0.25
+  _dashSpectrumCount: 5
   _playerSpectrum: {fileID: 7594934213551636910, guid: f98dd7c5d968869478fbdcb240993662, type: 3}
 --- !u!1 &412054568
 GameObject:
@@ -5677,7 +5678,7 @@ MonoBehaviour:
   _target: {fileID: 380460728}
   _allowXDistance: 3
   _allowYDistance: 2
-  _followSpeed: 9
+  _followSpeed: 7
 --- !u!1 &566856832
 GameObject:
   m_ObjectHideFlags: 0

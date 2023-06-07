@@ -9,12 +9,13 @@ public class Player : MonoBehaviour
     private SpriteRenderer _spriteRenderer;
 
     [SerializeField] private float _jumpForce, _moveSpeed, _dashForce, _glidDrag, _dashTime;
+    [SerializeField] private int _dashSpectrumCount;
     [SerializeField] private SpriteRenderer _playerSpectrum;
     private int _maxJumpCount = 2, _jumpCount = 2;
     private bool _isOnGround = false;
     private float _dashTimer = 0f, _dashDir;
     private float _dashSpectrumTimer = 0f;
-    private int _spectrumCount = 0;
+    private int _spectrumCounter = 0;
     private float _originalDrag;
 
     private void Awake()
@@ -59,19 +60,19 @@ public class Player : MonoBehaviour
 
             if((_dashSpectrumTimer -= Time.deltaTime) < 0f)
             {
-                _dashSpectrumTimer += _dashTime / 4f;
+                _dashSpectrumTimer += _dashTime / _dashSpectrumCount;
                 var spectrum = Instantiate(_playerSpectrum, transform.position, Quaternion.identity);
-                spectrum.sortingOrder -= _spectrumCount;
+                spectrum.sortingOrder -= _spectrumCounter;
                 var col = spectrum.color;
-                col.a = 0.2f + _spectrumCount * 0.2f;
+                col.a = 0.2f + ((_spectrumCounter + 1f) / _dashSpectrumCount) * 0.8f;
                 spectrum.color = col;
                 StartCoroutine(SpectrumRoutine(spectrum));
-                _spectrumCount++;
+                _spectrumCounter++;
             }
         }
-        else if(_spectrumCount > 0)
+        else if(_spectrumCounter > 0)
         {
-            _spectrumCount = 0;
+            _spectrumCounter = 0;
             _dashSpectrumTimer = 0f;
         }
     }

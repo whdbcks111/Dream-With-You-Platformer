@@ -7,7 +7,7 @@ public class Follow : MonoBehaviour
     [SerializeField] Transform _target;
     [SerializeField] private float _allowXDistance, _allowYDistance;
     [SerializeField] private float _followSpeed;
-    private Vector3 _offset;
+    private Vector3 _offset, _velocity = Vector3.zero;
 
     private void Awake()
     {
@@ -29,6 +29,6 @@ public class Follow : MonoBehaviour
         else if (transform.position.y > idealPos.y + _allowYDistance)
             targetPos.y = idealPos.y + _allowYDistance;
 
-        transform.position = Vector3.Lerp(transform.position, targetPos, _followSpeed * Time.fixedDeltaTime);
+        transform.position = Vector3.SmoothDamp(transform.position, targetPos, ref _velocity, 1 / _followSpeed, Mathf.Infinity, Time.fixedDeltaTime);
     }
 }
