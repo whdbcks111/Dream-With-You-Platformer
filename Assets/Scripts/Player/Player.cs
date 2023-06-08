@@ -59,7 +59,8 @@ public class Player : MonoBehaviour
         }
 
 
-        _rigid.velocity = _rigid.velocity * Vector2.up + _moveSpeed * (_swiftTimer > 0f ? _swiftForce : 1f) * hor * Vector2.right;
+        _rigid.velocity = _rigid.velocity * Vector2.up + 
+            _moveSpeed * (_swiftTimer > 0f ? _swiftForce : 1f) * hor * Vector2.right;
         if ((_dashTimer -= Time.deltaTime) > 0f)
         {
             if (_dashDir * hor < 0) _dashTimer = 0f;
@@ -119,7 +120,7 @@ public class Player : MonoBehaviour
     {
         _canDash = false;
         _dashTimer = _dashTime;
-        _dashDir = dir * _dashForce;
+        _dashDir = dir * _dashForce * (_swiftTimer > 0f ? _swiftForce : 1f);
     }
 
     private IEnumerator SpectrumRoutine(SpriteRenderer spriteRenderer)
@@ -174,10 +175,6 @@ public class Player : MonoBehaviour
         if (collision.gameObject.CompareTag("Enemy"))
         {
             Sleep();
-        }
-
-        if (collision.gameObject.CompareTag("Item"))
-        {
         }
     }
 
