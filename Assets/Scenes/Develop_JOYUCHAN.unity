@@ -42173,5 +42173,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _leftMax: 5
-  _rightMax: 5
+  _rightMax: 4
   _data: {fileID: 11400000, guid: 52ac7821dd466774481ca616a0aa38bc, type: 2}
