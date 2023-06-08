@@ -687,6 +687,7 @@ GameObject:
   - component: {fileID: 485833544}
   - component: {fileID: 485833543}
   - component: {fileID: 485833545}
+  - component: {fileID: 485833546}
   m_Layer: 0
   m_Name: Invincibility
   m_TagString: Item
@@ -777,6 +778,18 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 0.5
+--- !u!114 &485833546
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 485833542}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e70b336073b08448af3361eb23ce151, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!213 &600759247
 Sprite:
   m_ObjectHideFlags: 0

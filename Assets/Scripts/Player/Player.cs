@@ -30,11 +30,11 @@ public class Player : MonoBehaviour
     {
         if (_isOnGround) _canDash = true;
 
-        if(Input.GetButton("Jump") && _jumpCount == _maxJumpCount && _isOnGround)
+        if (Input.GetButton("Jump") && _jumpCount == _maxJumpCount && _isOnGround)
         {
             Jump();
         }
-        else if(Input.GetButtonDown("Jump") && _jumpCount > 0 && _jumpCount < _maxJumpCount)
+        else if (Input.GetButtonDown("Jump") && _jumpCount > 0 && _jumpCount < _maxJumpCount)
         {
             Jump();
         }
@@ -42,7 +42,7 @@ public class Player : MonoBehaviour
         _rigid.drag = Input.GetKey(KeyCode.LeftShift) ? _glidDrag : _originalDrag;
 
         var hor = Input.GetAxisRaw("Horizontal");
-        
+
         if (Mathf.Abs(hor) > Mathf.Epsilon)
         {
             if (_canDash && _dashTimer <= 0f && Input.GetKeyDown(KeyCode.Return))
@@ -51,15 +51,15 @@ public class Player : MonoBehaviour
             }
             _spriteRenderer.flipX = hor < 0f;
         }
-        
+
 
         _rigid.velocity = _rigid.velocity * Vector2.up + _moveSpeed * hor * Vector2.right;
-        if((_dashTimer -= Time.deltaTime) > 0f)
+        if ((_dashTimer -= Time.deltaTime) > 0f)
         {
             if (_dashDir * hor < 0) _dashTimer = 0f;
             _rigid.velocity = Vector2.right * _dashDir;
 
-            if((_dashSpectrumTimer -= Time.deltaTime) < 0f)
+            if ((_dashSpectrumTimer -= Time.deltaTime) < 0f)
             {
                 _dashSpectrumTimer += _dashTime / _dashSpectrumCount;
                 var spectrum = Instantiate(_playerSpectrum, transform.position, Quaternion.identity);
@@ -72,7 +72,7 @@ public class Player : MonoBehaviour
                 _spectrumCounter++;
             }
         }
-        else if(_spectrumCounter > 0)
+        else if (_spectrumCounter > 0)
         {
             _spectrumCounter = 0;
             _dashSpectrumTimer = 0f;
@@ -90,7 +90,7 @@ public class Player : MonoBehaviour
     {
         var col = spriteRenderer.color;
         var originalAlpha = col.a;
-        for(var i = 1f; i > 0f; i -= Time.deltaTime)
+        for (var i = 1f; i > 0f; i -= Time.deltaTime)
         {
             col.a = originalAlpha * i;
             spriteRenderer.color = col;
