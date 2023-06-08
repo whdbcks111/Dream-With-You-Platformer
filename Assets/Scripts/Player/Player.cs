@@ -120,7 +120,7 @@ public class Player : MonoBehaviour
     {
         _canDash = false;
         _dashTimer = _dashTime;
-        _dashDir = dir * _dashForce * (_swiftTimer > 0f ? _swiftForce : 1f);
+        _dashDir = dir * _dashForce;
     }
 
     private IEnumerator SpectrumRoutine(SpriteRenderer spriteRenderer)
