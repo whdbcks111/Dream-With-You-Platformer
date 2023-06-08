@@ -8,15 +8,20 @@ public class Player : MonoBehaviour
     private Rigidbody2D _rigid;
     private SpriteRenderer _spriteRenderer;
 
-    [SerializeField] private float _jumpForce, _moveSpeed, _dashForce, _glidDrag, _dashTime;
+    [SerializeField] private float _jumpForce, _moveSpeed, _dashForce, _glidDrag, _dashTime, _swiftForce;
     [SerializeField] private int _dashSpectrumCount;
     [SerializeField] private SpriteRenderer _playerSpectrum;
+
     private int _maxJumpCount = 2, _jumpCount = 2;
     private bool _isOnGround = false, _canDash = false;
     private float _dashTimer = 0f, _dashDir;
     private float _dashSpectrumTimer = 0f;
     private int _spectrumCounter = 0;
     private float _originalDrag;
+    private float _swiftTimer = 0f, _invincibilityTimer = 0f;
+
+    private Color _originalColor;
+    private Dictionary<string, Color> _colorMultipliers = new(); 
 
     private void Awake()
     {
@@ -24,6 +29,7 @@ public class Player : MonoBehaviour
         _rigid = GetComponent<Rigidbody2D>();
         _spriteRenderer = GetComponent<SpriteRenderer>();
         _originalDrag = _rigid.drag;
+        _originalColor = _spriteRenderer.color;
     }
 
     private void Update()
@@ -53,7 +59,7 @@ public class Player : MonoBehaviour
         }
 
 
-        _rigid.velocity = _rigid.velocity * Vector2.up + _moveSpeed * hor * Vector2.right;
+        _rigid.velocity = _rigid.velocity * Vector2.up + _moveSpeed * (_swiftTimer > 0f ? _swiftForce : 1f) * hor * Vector2.right;
         if ((_dashTimer -= Time.deltaTime) > 0f)
         {
             if (_dashDir * hor < 0) _dashTimer = 0f;
@@ -77,6 +83,36 @@ public class Player : MonoBehaviour
             _spectrumCounter = 0;
             _dashSpectrumTimer = 0f;
         }
+
+        if((_invincibilityTimer -= Time.deltaTime) > 0f)
+        {
+            // 무적 이펙트, 파티클
+            ApplyColor("inv", Color.yellow, 0.1f);
+        }
+
+        if((_swiftTimer -= Time.deltaTime) > 0f)
+        {
+            // 신속 이펙트, 파티클
+            ApplyColor("swift", Color.cyan, 0.1f);
+        }
+
+        _spriteRenderer.color = _originalColor;
+        foreach(var color in _colorMultipliers.Values)
+        {
+            _spriteRenderer.color *= color;
+        }
+    }
+
+    public void ApplyColor(string key, Color color, float time)
+    {
+        StartCoroutine(ColorRoutine(key, color, time));
+    }
+
+    private IEnumerator ColorRoutine(string key, Color color, float time)
+    {
+        _colorMultipliers[key] = color;
+        yield return new WaitForSeconds(time);
+        _colorMultipliers.Remove(key);
     }
 
     public void Dash(float dir)
@@ -112,17 +148,18 @@ public class Player : MonoBehaviour
 
     public void Sleep()
     {
+        if (_invincibilityTimer > 0f) return;
         StartCoroutine(SleepRoutine());
     }
 
     public void SetInvincibility(float time)
     {
-        //Not Implemented
+        _invincibilityTimer = time;
     }
 
     public void SetSwift(float time)
     {
-        //Not Implemented
+        _swiftTimer = time;
     }
 
     private IEnumerator SleepRoutine()

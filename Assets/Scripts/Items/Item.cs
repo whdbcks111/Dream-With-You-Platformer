@@ -6,11 +6,14 @@ public abstract class Item : MonoBehaviour
 {
     private bool _isUsed = false;
     private SpriteRenderer _spriteRenderer;
+    private Color _originalColor;
+
     protected float regenTime = 10;
 
     private void Awake()
     {
         _spriteRenderer = GetComponent<SpriteRenderer>();
+        _originalColor = _spriteRenderer.color;
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -29,7 +32,7 @@ public abstract class Item : MonoBehaviour
     }
     private void Update()
     {
-        _spriteRenderer.color = _isUsed ? new Color(.5f, .5f, .5f, .3f) : Color.white;
+        _spriteRenderer.color = _originalColor * (_isUsed ? new Color(.5f, .5f, .5f, .3f) : Color.white);
     }
     abstract public void OnUseItem(Player player);
 }
