@@ -115,6 +115,16 @@ public class Player : MonoBehaviour
         StartCoroutine(SleepRoutine());
     }
 
+    public void SetInvincibility(float time)
+    {
+        //Not Implemented
+    }
+
+    public void SetSwift(float time)
+    {
+        //Not Implemented
+    }
+
     private IEnumerator SleepRoutine()
     {
         yield return null;
@@ -129,17 +139,9 @@ public class Player : MonoBehaviour
             Sleep();
         }
 
-        if (collision.gameObject.CompareTag("Item")) //추가한 코드1(건호)
+        if (collision.gameObject.CompareTag("Item"))
         {
-            StartCoroutine(Invincivility());
         }
-    }
-
-    IEnumerator Invincivility() //
-    {
-        this.gameObject.layer = 10;
-        yield return new WaitForSeconds(5.0f);
-
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
