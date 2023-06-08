@@ -128,6 +128,18 @@ public class Player : MonoBehaviour
         {
             Sleep();
         }
+
+        if (collision.gameObject.CompareTag("Item")) //추가한 코드1(건호)
+        {
+            StartCoroutine(Invincivility());
+        }
+    }
+
+    IEnumerator Invincivility() //
+    {
+        this.gameObject.layer = 10;
+        yield return new WaitForSeconds(5.0f);
+
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
