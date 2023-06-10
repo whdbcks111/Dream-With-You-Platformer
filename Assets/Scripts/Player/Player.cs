@@ -55,6 +55,16 @@ public class Player : MonoBehaviour
 
     }
 
+    private void OnApplicationQuit()
+    {
+        if (_volumeProfile.TryGet(out ColorAdjustments ca))
+        {
+            ca.saturation.value = 0f;
+            ca.hueShift.value = 0f;
+            ca.contrast.value = 0f;
+        }
+    }
+
     private void Update()
     {
         if (_isOnGround) _canDash = true;
@@ -112,8 +122,10 @@ public class Player : MonoBehaviour
         }
         else // 잠들고 있는 상태라면
         {
+            _dashTimer = 0f;
             _spectrumCounter = 0;
             _dashSpectrumTimer = 0f;
+            _rigid.velocity *= Vector3.up;
         }
         
 
@@ -199,11 +211,12 @@ public class Player : MonoBehaviour
     {
         _isSleeping = true;
 
+        yield return new WaitForSeconds(0.8f);
         _volumeProfile.TryGet(out ColorAdjustments ca);
 
         _sleepPanel.gameObject.SetActive(true);
         var col = _sleepPanel.color;
-        for (var i = 0f; i < 1f; i += Time.deltaTime)
+        for (var i = 0f; i < 1f; i += Time.deltaTime / 1.5f)
         {
             col.a = i;
             _sleepPanel.color = col;
@@ -218,9 +231,9 @@ public class Player : MonoBehaviour
         _sleepPanel.color = col;
 
         transform.position = _spawnPoint;
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.8f);
 
-        for (var i = 1f; i >= 0f; i -= Time.deltaTime / 1.5f)
+        for (var i = 1f; i >= 0f; i -= Time.deltaTime / 1.3f)
         {
             col.a = i;
             _sleepPanel.color = col;
