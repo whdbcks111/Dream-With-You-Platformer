@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(BoxCollider2D), typeof(SpriteRenderer), typeof(Rigidbody2D))]
 public class Player : MonoBehaviour
 {
     private int platformLayer;
@@ -21,7 +22,9 @@ public class Player : MonoBehaviour
     private float _swiftTimer = 0f, _invincibilityTimer = 0f;
 
     private Color _originalColor;
-    private Dictionary<string, Color> _colorMultipliers = new(); 
+    private Dictionary<string, Color> _colorMultipliers = new();
+
+    private BoxCollider2D _boxCollider;
 
     private void Awake()
     {
@@ -30,6 +33,7 @@ public class Player : MonoBehaviour
         _spriteRenderer = GetComponent<SpriteRenderer>();
         _originalDrag = _rigid.drag;
         _originalColor = _spriteRenderer.color;
+        _boxCollider = GetComponent<BoxCollider2D>();
     }
 
     private void Update()
@@ -188,13 +192,15 @@ public class Player : MonoBehaviour
 
     private void OnCollisionStay2D(Collision2D collision)
     {
-        if ((collision.gameObject.layer & platformLayer) != 0 && transform.position.y > collision.GetContact(0).point.y)
+        if ((collision.gameObject.layer & platformLayer) != 0 &&
+            _boxCollider.bounds.min.y >= collision.GetContact(0).point.y &&
+            _rigid.velocity.y <= 0.1f)
         {
             _isOnGround = true;
             _jumpCount = _maxJumpCount;
-        }
-        if ((collision.gameObject.layer & platformLayer) != 0 && transform.position.y > collision.GetContact(0).point.y)
             TilesManager.Instance.OnGroundCollision(this, collision);
+        }
+            
     }
 
     private void OnCollisionExit2D(Collision2D collision)
