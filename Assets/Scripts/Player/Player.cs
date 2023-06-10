@@ -1,17 +1,20 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
+using UnityEngine.UI;
 
 [RequireComponent(typeof(BoxCollider2D), typeof(SpriteRenderer), typeof(Rigidbody2D))]
 public class Player : MonoBehaviour
 {
-    private int platformLayer;
-    private Rigidbody2D _rigid;
-    private SpriteRenderer _spriteRenderer;
 
     [SerializeField] private float _jumpForce, _moveSpeed, _dashForce, _glidDrag, _dashTime, _swiftForce;
     [SerializeField] private int _dashSpectrumCount;
     [SerializeField] private SpriteRenderer _playerSpectrum;
+    [SerializeField] private Image _sleepPanel;
+    [SerializeField] private VolumeProfile _volumeProfile;
+
 
     private int _maxJumpCount = 2, _jumpCount = 2;
     private bool _isOnGround = false, _canDash = false;
@@ -20,74 +23,99 @@ public class Player : MonoBehaviour
     private int _spectrumCounter = 0;
     private float _originalDrag;
     private float _swiftTimer = 0f, _invincibilityTimer = 0f;
+    private int _platformLayer;
+    private bool _isSleeping = false;
+
+    private Rigidbody2D _rigid;
+    private SpriteRenderer _spriteRenderer;
+    private BoxCollider2D _boxCollider;
 
     private Color _originalColor;
     private Dictionary<string, Color> _colorMultipliers = new();
 
-    private BoxCollider2D _boxCollider;
+    private Vector3 _spawnPoint;
 
     private void Awake()
     {
-        platformLayer = LayerMask.NameToLayer("Platform");
+        _platformLayer = LayerMask.NameToLayer("Platform");
         _rigid = GetComponent<Rigidbody2D>();
         _spriteRenderer = GetComponent<SpriteRenderer>();
         _originalDrag = _rigid.drag;
         _originalColor = _spriteRenderer.color;
         _boxCollider = GetComponent<BoxCollider2D>();
+
+        _spawnPoint = transform.position;
+
+        if (_volumeProfile.TryGet(out ColorAdjustments ca))
+        {
+            ca.saturation.value = 0f;
+            ca.hueShift.value = 0f;
+            ca.contrast.value = 0f;
+        }
+
     }
 
     private void Update()
     {
         if (_isOnGround) _canDash = true;
 
-        if (Input.GetButton("Jump") && _jumpCount == _maxJumpCount && _isOnGround)
+        // 이동, 조작 로직
+        if (!_isSleeping)
         {
-            Jump();
-        }
-        else if (Input.GetButtonDown("Jump") && _jumpCount > 0 && _jumpCount < _maxJumpCount)
-        {
-            Jump();
-        }
-
-        _rigid.drag = Input.GetKey(KeyCode.LeftShift) ? _glidDrag : _originalDrag;
-
-        var hor = Input.GetAxisRaw("Horizontal");
-
-        if (Mathf.Abs(hor) > Mathf.Epsilon)
-        {
-            if (_canDash && _dashTimer <= 0f && Input.GetKeyDown(KeyCode.Return))
+            if (Input.GetButton("Jump") && _jumpCount == _maxJumpCount && _isOnGround)
             {
-                Dash(hor);
+                Jump();
             }
-            _spriteRenderer.flipX = hor < 0f;
-        }
+            else if (Input.GetButtonDown("Jump") && _jumpCount > 0 && _jumpCount < _maxJumpCount)
+            {
+                Jump();
+            }
 
+            _rigid.drag = Input.GetKey(KeyCode.LeftShift) ? _glidDrag : _originalDrag;
 
-        _rigid.velocity = _rigid.velocity * Vector2.up + 
+            var hor = Input.GetAxisRaw("Horizontal");
+
+            if (Mathf.Abs(hor) > Mathf.Epsilon)
+            {
+                if (_canDash && _dashTimer <= 0f && Input.GetKeyDown(KeyCode.Return))
+                {
+                    Dash(hor);
+                }
+                _spriteRenderer.flipX = hor < 0f;
+            }
+
+            _rigid.velocity = _rigid.velocity * Vector2.up +
             _moveSpeed * (_swiftTimer > 0f ? _swiftForce : 1f) * hor * Vector2.right;
-        if ((_dashTimer -= Time.deltaTime) > 0f)
-        {
-            if (_dashDir * hor < 0) _dashTimer = 0f;
-            _rigid.velocity = Vector2.right * _dashDir;
-
-            if ((_dashSpectrumTimer -= Time.deltaTime) < 0f)
+            if ((_dashTimer -= Time.deltaTime) > 0f)
             {
-                _dashSpectrumTimer += _dashTime / _dashSpectrumCount;
-                var spectrum = Instantiate(_playerSpectrum, transform.position, Quaternion.identity);
-                spectrum.sortingOrder -= _spectrumCounter;
-                spectrum.flipX = _spriteRenderer.flipX;
-                var col = spectrum.color;
-                col.a = 0.2f + ((_spectrumCounter + 1f) / _dashSpectrumCount) * 0.8f;
-                spectrum.color = col;
-                StartCoroutine(SpectrumRoutine(spectrum));
-                _spectrumCounter++;
+                if (_dashDir * hor < 0) _dashTimer = 0f;
+                _rigid.velocity = Vector2.right * _dashDir;
+
+                if ((_dashSpectrumTimer -= Time.deltaTime) < 0f)
+                {
+                    _dashSpectrumTimer += _dashTime / _dashSpectrumCount;
+                    var spectrum = Instantiate(_playerSpectrum, transform.position, Quaternion.identity);
+                    spectrum.sortingOrder -= _spectrumCounter;
+                    spectrum.flipX = _spriteRenderer.flipX;
+                    var col = spectrum.color;
+                    col.a = 0.2f + ((_spectrumCounter + 1f) / _dashSpectrumCount) * 0.8f;
+                    spectrum.color = col;
+                    StartCoroutine(SpectrumRoutine(spectrum));
+                    _spectrumCounter++;
+                }
+            }
+            else if (_spectrumCounter > 0)
+            {
+                _spectrumCounter = 0;
+                _dashSpectrumTimer = 0f;
             }
         }
-        else if (_spectrumCounter > 0)
+        else // 잠들고 있는 상태라면
         {
             _spectrumCounter = 0;
             _dashSpectrumTimer = 0f;
         }
+        
 
         if((_invincibilityTimer -= Time.deltaTime) > 0f)
         {
@@ -151,12 +179,6 @@ public class Player : MonoBehaviour
         Jump(_jumpForce);
     }
 
-    public void Sleep()
-    {
-        if (_invincibilityTimer > 0f) return;
-        StartCoroutine(SleepRoutine());
-    }
-
     public void SetInvincibility(float time)
     {
         _invincibilityTimer = time;
@@ -167,16 +189,63 @@ public class Player : MonoBehaviour
         _swiftTimer = time;
     }
 
+    public void Sleep()
+    {
+        if (_invincibilityTimer > 0f) return;
+        StartCoroutine(SleepRoutine());
+    }
+
     private IEnumerator SleepRoutine()
     {
-        yield return null;
-        print("Sleep...");
-        //Not Implemented
+        _isSleeping = true;
+
+        _volumeProfile.TryGet(out ColorAdjustments ca);
+
+        _sleepPanel.gameObject.SetActive(true);
+        var col = _sleepPanel.color;
+        for (var i = 0f; i < 1f; i += Time.deltaTime)
+        {
+            col.a = i;
+            _sleepPanel.color = col;
+
+            ca.saturation.value = i * 100f;
+            ca.hueShift.value = i * -100f;
+            ca.contrast.value = i * 70f;
+
+            yield return null;
+        }
+        col.a = 1;
+        _sleepPanel.color = col;
+
+        transform.position = _spawnPoint;
+        yield return new WaitForSeconds(0.5f);
+
+        for (var i = 1f; i >= 0f; i -= Time.deltaTime / 1.5f)
+        {
+            col.a = i;
+            _sleepPanel.color = col;
+
+            ca.saturation.value = i * 100f;
+            ca.hueShift.value = i * -100f;
+            ca.contrast.value = i * 70f;
+
+            yield return null;
+        }
+        col.a = 0;
+        _sleepPanel.color = col;
+
+        ca.saturation.value = 0f;
+        ca.hueShift.value = 0f;
+        ca.contrast.value = 0f;
+
+        _sleepPanel.gameObject.SetActive(false);
+
+        _isSleeping = false;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.CompareTag("Enemy"))
+        if (collision.gameObject.CompareTag("Enemy") && !_isSleeping)
         {
             Sleep();
         }
@@ -184,7 +253,7 @@ public class Player : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.CompareTag("Enemy"))
+        if (collision.gameObject.CompareTag("Enemy") && !_isSleeping)
         {
             Sleep();
         }
@@ -192,7 +261,7 @@ public class Player : MonoBehaviour
 
     private void OnCollisionStay2D(Collision2D collision)
     {
-        if ((collision.gameObject.layer & platformLayer) != 0 &&
+        if ((collision.gameObject.layer & _platformLayer) != 0 &&
             _boxCollider.bounds.min.y >= collision.GetContact(0).point.y &&
             _rigid.velocity.y <= 0.1f)
         {
@@ -205,7 +274,7 @@ public class Player : MonoBehaviour
 
     private void OnCollisionExit2D(Collision2D collision)
     {
-        if ((collision.gameObject.layer & platformLayer) != 0)
+        if ((collision.gameObject.layer & _platformLayer) != 0)
             _isOnGround = false;
     }
 }
