@@ -12,22 +12,28 @@ public class StoryButton : CanvasOnOff
 
     private protected override void Awake()
     {
-        base.Awake();
+        if (_storyNum != 8)
+        {
+            base.Awake();
+        }
         _storyImage = GameObject.Find("CutScene").GetComponent<Image>();
         _sprite = Resources.Load<Sprite>("Story/StoryCutScene"+_storyNum);
     }
 
     protected override void Start()
     {
-        base.Start();
-        _button.onClick.AddListener(OnClickStoryButton);
+        if (_storyNum != 8)
+        {
+            base.Start();
+        }
+        _button?.onClick.AddListener(OnClickStoryButton);
         _warnText.text = "";
 
         if (PlayerPrefs.GetInt("CollectedPictureCount" + _storyNum) != 3)
         {
             //ÄÆ¾À Àá±ÝÇØÁ¦ ¾ÈµÊ
-            _button.onClick.RemoveAllListeners();
-            _button.onClick.AddListener(OnClickStoryLocked);
+            _button?.onClick.RemoveAllListeners();
+            _button?.onClick.AddListener(OnClickStoryLocked);
         }
     }
 
