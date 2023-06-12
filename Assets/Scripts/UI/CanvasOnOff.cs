@@ -10,7 +10,7 @@ public class CanvasOnOff : MonoBehaviour
 
     protected Button _button;
 
-    protected virtual private void Awake()
+    protected virtual void Awake()
     {
         _button = GetComponent<Button>();
     }

@@ -17,11 +17,11 @@ public class StageButton : MonoBehaviour
     private void Awake()
     {
         _story = GetComponentInChildren<StoryButton>();
-        _storySprite = _story is null ? _story.GetComponent<Image>() : null;
+        _storySprite = _story is not null ? _story.GetComponent<Image>() : null;
         _stageSprite = GetComponent<Image>();
         _stageButton = GetComponent<Button>();
 
-        _stageNum = _story._storyNum;
+        _stageNum = _story.StoryNum;
 
         if (!PlayerPrefs.HasKey("CollectedPictureCount" + _stageNum))
         {
@@ -90,7 +90,7 @@ public class StageButton : MonoBehaviour
 
     public void OnClickStageLocked()
     {
-        _story._warnText.text = "개방되지 않은 스테이지입니다.";
-        _story.WarnText();
+        _story.WarnText.text = "개방되지 않은 스테이지입니다.";
+        _story.Warn();
     }
 }
