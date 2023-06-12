@@ -17,6 +17,11 @@ public class BackgroundFit : MonoBehaviour
         Fit();
     }
 
+    private void Update()
+    {
+        Fit();
+    }
+
     private void Fit()
     {
         var leftBottom = Camera.main.ViewportToWorldPoint(Vector2.zero);
