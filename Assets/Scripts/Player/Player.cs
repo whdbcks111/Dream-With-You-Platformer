@@ -134,7 +134,13 @@ public class Player : MonoBehaviour
             _spectrumCounter = 0;
             _dashSpectrumTimer = 0f;
             _rigid.velocity *= Vector3.up;
+
+            _animator.SetBool("IsRunning", false);
+            _animator.SetBool("IsGliding", false);
+            _animator.SetBool("IsJumping", false);
         }
+
+        _animator.SetBool("IsSleeping", _isSleeping);
         
 
         if((_invincibilityTimer -= Time.deltaTime) > 0f)
@@ -217,6 +223,7 @@ public class Player : MonoBehaviour
 
     private IEnumerator SleepRoutine()
     {
+        yield return new WaitForSeconds(0.2f);
         _isSleeping = true;
 
         yield return new WaitForSeconds(0.8f);
