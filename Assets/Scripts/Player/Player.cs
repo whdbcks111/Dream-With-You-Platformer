@@ -29,6 +29,7 @@ public class Player : MonoBehaviour
     private Rigidbody2D _rigid;
     private SpriteRenderer _spriteRenderer;
     private BoxCollider2D _boxCollider;
+    private Animator _animator;
 
     private Color _originalColor;
     private Dictionary<string, Color> _colorMultipliers = new();
@@ -43,6 +44,7 @@ public class Player : MonoBehaviour
         _originalDrag = _rigid.drag;
         _originalColor = _spriteRenderer.color;
         _boxCollider = GetComponent<BoxCollider2D>();
+        _animator = GetComponent<Animator>();
 
         _spawnPoint = transform.position;
 
@@ -92,6 +94,11 @@ public class Player : MonoBehaviour
                     Dash(hor);
                 }
                 _spriteRenderer.flipX = hor < 0f;
+                _animator.SetBool("IsRunning", true);
+            }
+            else
+            {
+                _animator.SetBool("IsRunning", false);
             }
 
             _rigid.velocity = _rigid.velocity * Vector2.up +
@@ -107,6 +114,7 @@ public class Player : MonoBehaviour
                     var spectrum = Instantiate(_playerSpectrum, transform.position, Quaternion.identity);
                     spectrum.sortingOrder -= _spectrumCounter;
                     spectrum.flipX = _spriteRenderer.flipX;
+                    spectrum.sprite = _spriteRenderer.sprite;
                     var col = spectrum.color;
                     col.a = 0.2f + ((_spectrumCounter + 1f) / _dashSpectrumCount) * 0.8f;
                     spectrum.color = col;
