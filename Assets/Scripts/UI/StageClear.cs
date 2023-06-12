@@ -17,6 +17,7 @@ public class StageClear : MonoBehaviour
 
     private void Awake()
     {
+        PlayerPrefs.SetInt("EnterStage", 8);
         _canvas = GetComponent<CanvasGroup>();
         _backToStageSelectButton = GetComponentInChildren<Button>();
         _collectedPictureCount = GameObject.Find("PicturePieceText").GetComponent<Text>();
@@ -29,13 +30,23 @@ public class StageClear : MonoBehaviour
     {
         OffCanvas();
         _backToStageSelectButton.onClick.AddListener(OnClickBackToStageSelect);
+
+        if (_currentStage == 8)
+        {
+            Destroy(_collectedPictureCount);
+            Destroy(_collectedPictureCountImage);
+            Destroy(GameObject.Find("PictureText"));
+        }
     }
 
     public void StageCleared()
     {
         OnCanvas();
-        _collectedPictureCount.text = _pictureControl._collectedPicture.ToString() + " / 3";
-        _collectedPictureCountImage.sprite = Resources.Load<Sprite>("Picture/Picture" + _pictureControl._collectedPicture);
+        if (_currentStage != 8)
+        {
+            _collectedPictureCount.text = _pictureControl._collectedPicture.ToString() + " / 3";
+            _collectedPictureCountImage.sprite = Resources.Load<Sprite>("Picture/Picture" + _pictureControl._collectedPicture);
+        }
     }
 
     public void OnClickBackToStageSelect()

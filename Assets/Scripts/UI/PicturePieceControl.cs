@@ -12,6 +12,10 @@ public class PicturePieceControl : MonoBehaviour
 
     private void Awake()
     {
+        if (PlayerPrefs.GetInt("EnterStage") == 8)
+        {
+            Destroy(gameObject);
+        }
         _picturePieces = FindObjectsOfType<PicturePiece>();
         _image = GetComponent<Image>();
         _collectedPicture = 0;
