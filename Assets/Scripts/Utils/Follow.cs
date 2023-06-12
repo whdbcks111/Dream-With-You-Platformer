@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 
 public class Follow : MonoBehaviour
 {
@@ -9,8 +10,9 @@ public class Follow : MonoBehaviour
     [SerializeField] private float _followSpeed;
     private Vector3 _offset, _velocity = Vector3.zero;
 
-    private void Awake()
+    private void Start()
     {
+        _target = FindObjectOfType<Player>().GetComponent<Transform>();
         _offset = transform.position - _target.position;
     }
 
