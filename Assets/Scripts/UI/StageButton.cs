@@ -7,18 +7,17 @@ using UnityEngine.UI;
 
 public class StageButton : MonoBehaviour
 {
-    StoryButton _story;
-    Image _storySprite;
-    Image _stageSprite;
-    Button _stageButton;
+    private StoryButton _story;
+    private Image _storySprite;
+    private Image _stageSprite;
+    private Button _stageButton;
 
-    int _stageNum;
-    bool _stage8Active;
+    private int _stageNum;
 
     private void Awake()
     {
         _story = GetComponentInChildren<StoryButton>();
-        _storySprite = _story?.gameObject.GetComponent<Image>();
+        _storySprite = _story is null ? _story.GetComponent<Image>() : null;
         _stageSprite = GetComponent<Image>();
         _stageButton = GetComponent<Button>();
 
@@ -45,65 +44,39 @@ public class StageButton : MonoBehaviour
         {
             if (_stageNum == 8)
             {
-                _stage8Active = true;
+                bool flag = true;
 
-                if (PlayerPrefs.GetInt("CollectedPictureCount1") != 3)
+                for(int i = 1; i < 7; ++i)
                 {
-                    _stage8Active = false;
-                }
-                if (PlayerPrefs.GetInt("CollectedPictureCount2") != 3)
-                {
-                    _stage8Active = false;
-                }
-                if (PlayerPrefs.GetInt("CollectedPictureCount3") != 3)
-                {
-                    _stage8Active = false;
-                }
-                if (PlayerPrefs.GetInt("CollectedPictureCount4") != 3)
-                {
-                    _stage8Active = false;
-                }
-                if (PlayerPrefs.GetInt("CollectedPictureCount5") != 3)
-                {
-                    _stage8Active = false;
-                }
-                if (PlayerPrefs.GetInt("CollectedPictureCount6") != 3)
-                {
-                    _stage8Active = false;
-                }
-                if (PlayerPrefs.GetInt("CollectedPictureCount7") != 3)
-                {
-                    _stage8Active = false;
+                    if (PlayerPrefs.GetInt("CollectedPictureCount" + i, 0) < 3)
+                    {
+                        flag = false;
+                        break;
+                    }
                 }
 
-                if (_stage8Active)
-                {
-                    _stageSprite.sprite = Resources.Load<Sprite>("Stage/StageChallenge");
-                    _stageButton.onClick.AddListener(OnClickStageEnter);
-                }
-                else
-                {
-                    StageLocked();
-                }
+                if (flag) MarkAsChallengeStage();
+                else MarkAsLockedStage();
             }
-            else
-            {
-                _stageSprite.sprite = Resources.Load<Sprite>("Stage/StageChallenge");
-                _stageButton.onClick.AddListener(OnClickStageEnter);
-            }
+            else MarkAsChallengeStage();
         }
-        else if (PlayerPrefs.GetInt("ClearedStage") >= _stageNum)
-        {
-            _stageSprite.sprite = Resources.Load<Sprite>("Stage/StageCleared");
-            _stageButton.onClick.AddListener(OnClickStageEnter);
-        }
-        else
-        {
-            StageLocked();
-        }
+        else if (PlayerPrefs.GetInt("ClearedStage") >= _stageNum) MarkAsClearedStage();
+        else MarkAsLockedStage();
     }
 
-    public void StageLocked()
+    public void MarkAsClearedStage()
+    {
+        _stageSprite.sprite = Resources.Load<Sprite>("Stage/StageCleared");
+        _stageButton.onClick.AddListener(OnClickStageEnter);
+    }
+
+    public void MarkAsChallengeStage()
+    {
+        _stageSprite.sprite = Resources.Load<Sprite>("Stage/StageChallenge");
+        _stageButton.onClick.AddListener(OnClickStageEnter);
+    }
+
+    public void MarkAsLockedStage()
     {
         _stageSprite.sprite = Resources.Load<Sprite>("Stage/StageLocked");
         _stageButton.onClick.AddListener(OnClickStageLocked);
