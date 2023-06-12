@@ -17,7 +17,6 @@ public class StageClear : MonoBehaviour
 
     private void Awake()
     {
-        PlayerPrefs.SetInt("EnterStage", 8);
         _canvas = GetComponent<CanvasGroup>();
         _backToStageSelectButton = GetComponentInChildren<Button>();
         _collectedPictureCount = GameObject.Find("PicturePieceText").GetComponent<Text>();

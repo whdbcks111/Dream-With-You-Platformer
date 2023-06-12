@@ -11,6 +11,7 @@ public class StoryButton : CanvasOnOff
     
     private Image _storyImage;
     private Sprite _sprite;
+    private IEnumerator _warnRoutine;
 
     protected override void Awake()
     {
@@ -51,10 +52,12 @@ public class StoryButton : CanvasOnOff
         Warn();
     }
 
-    public void Warn()
+    public void Warn() 
     {
+        if (_warnRoutine != null) StopCoroutine(_warnRoutine);
         WarnText.color = new Color(WarnText.color.r, WarnText.color.b, WarnText.color.g, 1);
-        StartCoroutine(WarnRoutine());
+        _warnRoutine = WarnRoutine();
+        StartCoroutine(_warnRoutine);
     }
 
     IEnumerator WarnRoutine()
