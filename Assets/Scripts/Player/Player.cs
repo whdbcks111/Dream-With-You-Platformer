@@ -83,7 +83,7 @@ public class Player : MonoBehaviour
                 Jump();
             }
 
-            _rigid.drag = Input.GetKey(KeyCode.LeftShift) ? _glidDrag : _originalDrag;
+            _rigid.drag = Input.GetKey(KeyCode.LeftShift) && _rigid.velocity.y < 0f ? _glidDrag : _originalDrag;
 
             var hor = Input.GetAxisRaw("Horizontal");
 
