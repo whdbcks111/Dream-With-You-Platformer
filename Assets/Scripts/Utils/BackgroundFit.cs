@@ -35,11 +35,11 @@ public class BackgroundFit : MonoBehaviour
 
         if(screenRatio > spriteRatio)
         {
-            _spriteRenderer.gameObject.transform.localScale *= ((rightTop.x - leftBottom.x) / boundsSize.x);
+            _spriteRenderer.gameObject.transform.localScale *= ((rightTop.x - leftBottom.x) / boundsSize.x) * 1.04f;
         }
         else
         {
-            _spriteRenderer.gameObject.transform.localScale *= ((rightTop.y - leftBottom.y) / boundsSize.y);
+            _spriteRenderer.gameObject.transform.localScale *= ((rightTop.y - leftBottom.y) / boundsSize.y) * 1.04f;
         }
     }
 }
