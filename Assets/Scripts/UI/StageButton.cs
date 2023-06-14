@@ -84,8 +84,7 @@ public class StageButton : MonoBehaviour
 
     public void OnClickStageEnter()
     {
-        PlayerPrefs.SetInt("EnterStage", _stageNum);
-        SceneManager.LoadScene("InGameScene");
+        StageEnterManager.Instance.EnterStage(_stageNum);
     }
 
     public void OnClickStageLocked()
