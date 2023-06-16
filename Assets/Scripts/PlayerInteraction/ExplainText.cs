@@ -7,61 +7,18 @@ using UnityEngine.UI;
 [RequireComponent(typeof(BoxCollider2D))]
 public class ExplainText : MonoBehaviour
 {
-    Text _text;
+    [SerializeField] private float _maxDistance = 10f, _minDistance = 5f;
+    private Text _text;
 
     private void Awake()
     {
         _text = GetComponent<Text>();
     }
 
-    void Start()
+    private void Update()
     {
-        _text.color = new Color(_text.color.r, _text.color.g, _text.color.b, 0);
-    }
-
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        if (collision.tag == "Player")
-        {
-            StartCoroutine(OnText());
-        }
-    }
-
-    private void OnTriggerExit2D(Collider2D collision)
-    {
-        if (collision.tag == "Player")
-        {
-            StartCoroutine(OffText());
-        }
-    }
-
-    IEnumerator OnText()
-    {
-        yield return new WaitForFixedUpdate();
-
-        _text.color = new Color(_text.color.r, _text.color.g, _text.color.b, _text.color.a + Time.deltaTime * 3);
-        if (_text.color.a >= 1)
-        {
-            yield return null;
-        }
-        else
-        {
-            StartCoroutine(OnText());
-        }
-    }
-
-    IEnumerator OffText()
-    {
-        yield return new WaitForFixedUpdate();
-
-        _text.color = new Color(_text.color.r, _text.color.g, _text.color.b, _text.color.a - Time.deltaTime* 3);
-        if (_text.color.a <= 0)
-        {
-            yield return null;
-        }
-        else
-        {
-            StartCoroutine(OffText());
-        }
+        var dist = (Player.Instance.transform.position - transform.position).magnitude;
+        _text.color = new Color(_text.color.r, _text.color.g, _text.color.b, 
+            Mathf.Clamp01(1 - Mathf.Max(0, dist - _minDistance) / (_maxDistance - _minDistance)));
     }
 }

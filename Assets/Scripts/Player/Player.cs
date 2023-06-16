@@ -8,13 +8,13 @@ using UnityEngine.UI;
 [RequireComponent(typeof(BoxCollider2D), typeof(SpriteRenderer), typeof(Rigidbody2D))]
 public class Player : MonoBehaviour
 {
+    public static Player Instance;
 
     [SerializeField] private float _jumpForce, _moveSpeed, _dashForce, _glidDrag, _dashTime, _swiftForce;
     [SerializeField] private int _dashSpectrumCount;
     [SerializeField] private SpriteRenderer _playerSpectrum;
     [SerializeField] private Image _sleepPanel;
     [SerializeField] private VolumeProfile _volumeProfile;
-
 
     private int _maxJumpCount = 2, _jumpCount = 2;
     private bool _isOnGround = false, _canDash = false;
@@ -38,6 +38,8 @@ public class Player : MonoBehaviour
 
     private void Awake()
     {
+        Instance = this;
+
         _platformLayer = LayerMask.NameToLayer("Platform");
         _rigid = GetComponent<Rigidbody2D>();
         _spriteRenderer = GetComponent<SpriteRenderer>();
