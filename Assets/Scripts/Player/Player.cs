@@ -160,6 +160,8 @@ public class Player : MonoBehaviour
         {
             _spriteRenderer.color *= color;
         }
+
+        if (transform.position.y < -30f) Sleep();
     }
 
     public void ApplyColor(string key, Color color, float time)
@@ -218,6 +220,7 @@ public class Player : MonoBehaviour
     public void Sleep()
     {
         if (_invincibilityTimer > 0f) return;
+        if (_isSleeping) return;
         StartCoroutine(SleepRoutine());
     }
 
