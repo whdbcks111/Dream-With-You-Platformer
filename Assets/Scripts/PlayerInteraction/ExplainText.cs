@@ -17,7 +17,7 @@ public class ExplainText : MonoBehaviour
 
     private void Update()
     {
-        var dist = (Player.Instance.transform.position - transform.position).magnitude;
+        var dist = ((Vector2)(Player.Instance.transform.position - transform.position)).magnitude;
         _text.color = new Color(_text.color.r, _text.color.g, _text.color.b, 
             Mathf.Clamp01(1 - Mathf.Max(0, dist - _minDistance) / (_maxDistance - _minDistance)));
     }
