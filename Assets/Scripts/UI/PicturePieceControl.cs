@@ -20,7 +20,7 @@ public class PicturePieceControl : MonoBehaviour
         _image = GetComponent<Image>();
         _collectedPicture = 0;
     }
-
+    
     void Start()
     {
         if (_picturePieces.Length != 3)

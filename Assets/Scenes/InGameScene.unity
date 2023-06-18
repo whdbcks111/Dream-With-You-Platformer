@@ -220,7 +220,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &257001554
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -766,6 +766,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33f2028b3cf3d42479ff3f5a483456b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _maxDistance: 10
+  _minDistance: 5
 --- !u!61 &788264854
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -1598,7 +1600,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1128149257
 Transform:
   m_ObjectHideFlags: 0
@@ -1856,6 +1858,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33f2028b3cf3d42479ff3f5a483456b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _maxDistance: 10
+  _minDistance: 5
 --- !u!61 &1162981325
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -2922,6 +2926,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33f2028b3cf3d42479ff3f5a483456b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _maxDistance: 10
+  _minDistance: 5
 --- !u!61 &1444649824
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -3288,6 +3294,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33f2028b3cf3d42479ff3f5a483456b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _maxDistance: 10
+  _minDistance: 5
 --- !u!61 &1588453033
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -3557,6 +3565,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33f2028b3cf3d42479ff3f5a483456b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _maxDistance: 10
+  _minDistance: 5
 --- !u!61 &1640202162
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -5061,17 +5071,7 @@ CompositeCollider2D:
   m_GeometryType: 1
   m_GenerationType: 0
   m_EdgeRadius: 0
-  m_ColliderPaths:
-  - m_Collider: {fileID: 8886033403669126305}
-    m_ColliderPaths:
-    - - X: -50000000
-        Y: -30000000
-      - X: 50000000
-        Y: -30000000
-      - X: 50000000
-        Y: -20000000
-      - X: -50000000
-        Y: -20000000
+  m_ColliderPaths: []
   m_CompositePaths:
     m_Paths:
     - - {x: 4.999971, y: -3}
@@ -7797,9 +7797,7 @@ CompositeCollider2D:
   m_GeometryType: 1
   m_GenerationType: 0
   m_EdgeRadius: 0
-  m_ColliderPaths:
-  - m_Collider: {fileID: 7725035789521842989}
-    m_ColliderPaths: []
+  m_ColliderPaths: []
   m_CompositePaths:
     m_Paths: []
   m_VertexDistance: 0.3
@@ -7843,9 +7841,7 @@ CompositeCollider2D:
   m_GeometryType: 1
   m_GenerationType: 0
   m_EdgeRadius: 0
-  m_ColliderPaths:
-  - m_Collider: {fileID: 8864043201794814020}
-    m_ColliderPaths: []
+  m_ColliderPaths: []
   m_CompositePaths:
     m_Paths: []
   m_VertexDistance: 0.3
@@ -9715,9 +9711,7 @@ CompositeCollider2D:
   m_GeometryType: 1
   m_GenerationType: 0
   m_EdgeRadius: 0
-  m_ColliderPaths:
-  - m_Collider: {fileID: 4726591227908442908}
-    m_ColliderPaths: []
+  m_ColliderPaths: []
   m_CompositePaths:
     m_Paths: []
   m_VertexDistance: 0.3
@@ -10083,9 +10077,7 @@ CompositeCollider2D:
   m_GeometryType: 1
   m_GenerationType: 0
   m_EdgeRadius: 0
-  m_ColliderPaths:
-  - m_Collider: {fileID: 2886760202933864768}
-    m_ColliderPaths: []
+  m_ColliderPaths: []
   m_CompositePaths:
     m_Paths: []
   m_VertexDistance: 0.3
@@ -10896,9 +10888,7 @@ CompositeCollider2D:
   m_GeometryType: 1
   m_GenerationType: 0
   m_EdgeRadius: 0
-  m_ColliderPaths:
-  - m_Collider: {fileID: 4512092832741631063}
-    m_ColliderPaths: []
+  m_ColliderPaths: []
   m_CompositePaths:
     m_Paths: []
   m_VertexDistance: 0.3
@@ -12428,9 +12418,7 @@ CompositeCollider2D:
   m_GeometryType: 1
   m_GenerationType: 0
   m_EdgeRadius: 0
-  m_ColliderPaths:
-  - m_Collider: {fileID: 8375182716885590312}
-    m_ColliderPaths: []
+  m_ColliderPaths: []
   m_CompositePaths:
     m_Paths: []
   m_VertexDistance: 0.3

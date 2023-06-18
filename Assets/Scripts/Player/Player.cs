@@ -36,6 +36,16 @@ public class Player : MonoBehaviour
 
     private Vector3 _spawnPoint;
 
+    public bool IsDashUnlocked
+    {
+        get { return PlayerPrefs.GetInt("EnterStage") >= 5; }
+    }
+
+    public bool IsGlidUnlocked
+    {
+        get { return PlayerPrefs.GetInt("EnterStage") >= 3; }
+    }
+
     private void Awake()
     {
         Instance = this;
@@ -85,7 +95,7 @@ public class Player : MonoBehaviour
                 Jump();
             }
 
-            _rigid.drag = Input.GetKey(KeyCode.LeftShift) && _rigid.velocity.y < 0f ? _glidDrag : _originalDrag;
+            GlidUpdate();
 
             var hor = Input.GetAxisRaw("Horizontal");
 
@@ -104,31 +114,9 @@ public class Player : MonoBehaviour
             }
 
             _rigid.velocity = _rigid.velocity * Vector2.up +
-            _moveSpeed * (_swiftTimer > 0f ? _swiftForce : 1f) * hor * Vector2.right;
-            if ((_dashTimer -= Time.deltaTime) > 0f)
-            {
-                if (_dashDir * hor < 0) _dashTimer = 0f;
-                _rigid.velocity = Vector2.right * _dashDir;
+                _moveSpeed * (_swiftTimer > 0f ? _swiftForce : 1f) * hor * Vector2.right;
 
-                if ((_dashSpectrumTimer -= Time.deltaTime) < 0f)
-                {
-                    _dashSpectrumTimer += _dashTime / _dashSpectrumCount;
-                    var spectrum = Instantiate(_playerSpectrum, transform.position, Quaternion.identity);
-                    spectrum.sortingOrder -= _spectrumCounter;
-                    spectrum.flipX = _spriteRenderer.flipX;
-                    spectrum.sprite = _spriteRenderer.sprite;
-                    var col = spectrum.color;
-                    col.a = 0.2f + ((_spectrumCounter + 1f) / _dashSpectrumCount) * 0.8f;
-                    spectrum.color = col;
-                    StartCoroutine(SpectrumRoutine(spectrum));
-                    _spectrumCounter++;
-                }
-            }
-            else if (_spectrumCounter > 0)
-            {
-                _spectrumCounter = 0;
-                _dashSpectrumTimer = 0f;
-            }
+            DashUpdate(hor);
         }
         else // 잠들고 있는 상태라면
         {
@@ -166,6 +154,39 @@ public class Player : MonoBehaviour
         if (transform.position.y < -30f) Sleep();
     }
 
+    private void DashUpdate(float hor)
+    {
+        if ((_dashTimer -= Time.deltaTime) > 0f)
+        {
+            if (_dashDir * hor < 0) _dashTimer = 0f;
+            _rigid.velocity = Vector2.right * _dashDir;
+
+            if ((_dashSpectrumTimer -= Time.deltaTime) < 0f)
+            {
+                _dashSpectrumTimer += _dashTime / _dashSpectrumCount;
+                var spectrum = Instantiate(_playerSpectrum, transform.position, Quaternion.identity);
+                spectrum.sortingOrder -= _spectrumCounter;
+                spectrum.flipX = _spriteRenderer.flipX;
+                spectrum.sprite = _spriteRenderer.sprite;
+                var col = spectrum.color;
+                col.a = 0.2f + ((_spectrumCounter + 1f) / _dashSpectrumCount) * 0.8f;
+                spectrum.color = col;
+                StartCoroutine(SpectrumRoutine(spectrum));
+                _spectrumCounter++;
+            }
+        }
+        else if (_spectrumCounter > 0)
+        {
+            _spectrumCounter = 0;
+            _dashSpectrumTimer = 0f;
+        }
+    }
+
+    private void GlidUpdate()
+    {
+        _rigid.drag = Input.GetKey(KeyCode.LeftShift) && _rigid.velocity.y < 0f && IsGlidUnlocked ? _glidDrag : _originalDrag;
+    }
+
     public void ApplyColor(string key, Color color, float time)
     {
         StartCoroutine(ColorRoutine(key, color, time));
@@ -180,6 +201,7 @@ public class Player : MonoBehaviour
 
     public void Dash(float dir)
     {
+        if (!IsDashUnlocked) return;
         _canDash = false;
         _dashTimer = _dashTime;
         _dashDir = dir * _dashForce;
