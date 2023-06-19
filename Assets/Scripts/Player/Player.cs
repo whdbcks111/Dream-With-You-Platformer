@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 [RequireComponent(typeof(BoxCollider2D), typeof(SpriteRenderer), typeof(Rigidbody2D))]
@@ -38,12 +39,17 @@ public class Player : MonoBehaviour
 
     public bool IsDashUnlocked
     {
-        get { return PlayerPrefs.GetInt("EnterStage") >= 5; }
+        get { return !SceneManager.GetActiveScene().name.Equals("InGameScene") || PlayerPrefs.GetInt("EnterStage") >= 5; }
     }
 
     public bool IsGlidUnlocked
     {
-        get { return PlayerPrefs.GetInt("EnterStage") >= 3; }
+        get { return !SceneManager.GetActiveScene().name.Equals("InGameScene") || PlayerPrefs.GetInt("EnterStage") >= 3; }
+    }
+
+    public bool IsGliding
+    {
+        get { return Input.GetKey(KeyCode.LeftShift) && _rigid.velocity.y < 0f && IsGlidUnlocked; }
     }
 
     private void Awake()
@@ -127,13 +133,13 @@ public class Player : MonoBehaviour
 
             _animator.SetBool("IsRunning", false);
             _animator.SetBool("IsGliding", false);
-            _animator.SetBool("IsJumping", false);
         }
 
         _animator.SetBool("IsSleeping", _isSleeping);
-        
+        _animator.SetFloat("JumpVelocity", _rigid.velocity.y);
 
-        if((_invincibilityTimer -= Time.deltaTime) > 0f)
+
+        if ((_invincibilityTimer -= Time.deltaTime) > 0f)
         {
             // 무적 이펙트, 파티클
             ApplyColor("inv", Color.yellow, 0.1f);
@@ -156,6 +162,9 @@ public class Player : MonoBehaviour
 
     private void DashUpdate(float hor)
     {
+
+        _animator.SetBool("IsDashing", _dashTimer > 0f);
+        
         if ((_dashTimer -= Time.deltaTime) > 0f)
         {
             if (_dashDir * hor < 0) _dashTimer = 0f;
@@ -184,7 +193,9 @@ public class Player : MonoBehaviour
 
     private void GlidUpdate()
     {
-        _rigid.drag = Input.GetKey(KeyCode.LeftShift) && _rigid.velocity.y < 0f && IsGlidUnlocked ? _glidDrag : _originalDrag;
+        var isGliding = IsGliding;
+        _animator.SetBool("IsGliding", isGliding);
+        _rigid.drag = isGliding ? _glidDrag : _originalDrag;
     }
 
     public void ApplyColor(string key, Color color, float time)
