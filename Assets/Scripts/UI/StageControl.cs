@@ -13,6 +13,6 @@ public class StageControl : MonoBehaviour
     {
         _currentStage = PlayerPrefs.GetInt("EnterStage");
         _text.text = "Stage " + _currentStage;
-        Instantiate(Resources.Load("StagePrefabs/Stage" + _currentStage));   
+        Instantiate(Resources.Load("StagePrefabs/Stage" + _currentStage));
     }
 }
