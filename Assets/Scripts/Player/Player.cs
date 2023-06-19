@@ -16,11 +16,14 @@ public class Player : MonoBehaviour
     [SerializeField] private SpriteRenderer _playerSpectrum;
     [SerializeField] private Image _sleepPanel;
     [SerializeField] private VolumeProfile _volumeProfile;
+    [SerializeField] private Image _dashCooldownImage;
+    [SerializeField] private float _dashCooldown = 10f;
 
     private int _maxJumpCount = 2, _jumpCount = 2;
     private bool _isOnGround = false, _canDash = false;
     private float _dashTimer = 0f, _dashDir;
     private float _dashSpectrumTimer = 0f;
+    private float _dashRemainCooldown = 0f;
     private int _spectrumCounter = 0;
     private float _originalDrag;
     private float _swiftTimer = 0f, _invincibilityTimer = 0f;
@@ -107,7 +110,7 @@ public class Player : MonoBehaviour
 
             if (Mathf.Abs(hor) > Mathf.Epsilon)
             {
-                if (_canDash && _dashTimer <= 0f && Input.GetKeyDown(KeyCode.Return))
+                if (_canDash && _dashRemainCooldown <= 0f && _dashTimer <= 0f && Input.GetKeyDown(KeyCode.Return))
                 {
                     Dash(hor);
                 }
@@ -164,6 +167,11 @@ public class Player : MonoBehaviour
     {
 
         _animator.SetBool("IsDashing", _dashTimer > 0f);
+
+        if(_dashRemainCooldown > 0f) _dashRemainCooldown -= Time.deltaTime;
+
+        _dashCooldownImage.fillAmount = Mathf.Clamp01(_dashRemainCooldown / _dashCooldown);
+        _dashCooldownImage.transform.parent.gameObject.SetActive(IsDashUnlocked);
         
         if ((_dashTimer -= Time.deltaTime) > 0f)
         {
@@ -213,6 +221,7 @@ public class Player : MonoBehaviour
     public void Dash(float dir)
     {
         if (!IsDashUnlocked) return;
+        _dashRemainCooldown = _dashCooldown;
         _canDash = false;
         _dashTimer = _dashTime;
         _dashDir = dir * _dashForce;
