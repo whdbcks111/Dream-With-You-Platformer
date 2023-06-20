@@ -12,7 +12,6 @@ public class Follow : MonoBehaviour
 
     private void Start()
     {
-        _target = FindObjectOfType<Player>().GetComponent<Transform>();
         _offset = transform.position - _target.position;
     }
 
