@@ -242,6 +242,7 @@ public class Player : MonoBehaviour
 
     public void Jump(float force)
     {
+        SoundManager.Instance.Play("Jump", 0.5f, 0.6f);
         --_jumpCount;
         _rigid.velocity = Vector2.up * force;
     }
