@@ -21,6 +21,7 @@ public class FinishPlace : MonoBehaviour
 
     void GameCleared()
     {
+        SoundManager.Instance.Play("Clear");
         Time.timeScale = 0;
         _stageClear.StageCleared();
     }
