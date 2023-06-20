@@ -327,13 +327,12 @@ public class Player : MonoBehaviour
         if (_invincibilityTimer > 0f) return;
         if (_isSleeping) return;
         SoundManager.Instance.Play("Sleep", 0.1f, 0.8f);
+        _isSleeping = true;
         StartCoroutine(SleepRoutine());
     }
 
     private IEnumerator SleepRoutine()
     {
-        yield return new WaitForSeconds(0.2f);
-        _isSleeping = true;
 
         yield return new WaitForSeconds(0.8f);
         _volumeProfile.TryGet(out ColorAdjustments ca);
