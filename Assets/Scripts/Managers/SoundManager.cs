@@ -7,6 +7,8 @@ public class SoundManager : MonoBehaviour
 {
     public static SoundManager Instance { get; private set; }
 
+    public float VolumeMultiplier = 1f;
+
     [SerializeField] private AudioInfo[] _clips;
     private AudioSource _sourcePrefab;
 
@@ -25,6 +27,7 @@ public class SoundManager : MonoBehaviour
 
     public void Play(string name, float volume = 1f, float pitch = 1f)
     {
+        volume *= VolumeMultiplier;
         var clip = _clipMap[name];
         if (clip == null) return;
         var source = _waitingSources.TryDequeue(out AudioSource result) ? result : Instantiate(_sourcePrefab, transform);

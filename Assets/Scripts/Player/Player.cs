@@ -109,9 +109,9 @@ public class Player : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.K))
         {
             ShowSpeech(new MessageAction[] {
-                new MessageAction("나", "안녕하세요", () => { }),
-                new MessageAction("나", "안녕하세요2", () => { }),
-                new MessageAction("나", "안녕하세요3", () => { })
+                new("나", "안녕하세요", () => { }),
+                new("나", "안녕하세요2", () => { }),
+                new("나", "안녕하세요3", () => { })
             });
         }
 
