@@ -51,6 +51,7 @@ public class Player : MonoBehaviour
     private Vector3 _spawnPoint;
 
     private readonly Queue<MessageAction> _messageActions = new();
+    private bool _ending = false;
 
     public bool IsDashUnlocked
     {
@@ -100,8 +101,33 @@ public class Player : MonoBehaviour
         }
     }
 
+    public void End()
+    {
+        _ending = true;
+        StartCoroutine(EndingRoutine());
+    }
+
+    private IEnumerator EndingRoutine()
+    {
+        _sleepPanel.gameObject.SetActive(true);
+        var col = _sleepPanel.color;
+        _spriteRenderer.flipX = true;
+        _animator.SetBool("IsRunning", true);
+        for (float i = 0f; i < 10f; i += Time.deltaTime)
+        {
+            _rigid.velocity = _rigid.velocity * Vector2.up +
+               _moveSpeed * 0.2f * Vector2.left;
+            _sleepPanel.color = new(0, 0, 0, Mathf.Clamp01(i / 10f));
+            yield return null;
+        }
+
+        yield return new WaitForSeconds(3f);
+        SceneManager.LoadScene("TitleScene");
+    }
+
     private void Update()
     {
+        if (_ending) return;
         if (_isOnGround) _canDash = true;
 
 
