@@ -1,6 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
@@ -18,6 +21,13 @@ public class Player : MonoBehaviour
     [SerializeField] private VolumeProfile _volumeProfile;
     [SerializeField] private Image _dashCooldownImage;
     [SerializeField] private float _dashCooldown = 10f;
+    [SerializeField] private AudioSource _glidSource; 
+
+    [Space]
+    [Header("SpeechBubble")]
+    [SerializeField] private TextMeshProUGUI _speechNameUI;
+    [SerializeField] private TextMeshProUGUI _speechMessageUI;
+    [SerializeField] private Button _speechNextButton;
 
     private int _maxJumpCount = 2, _jumpCount = 2;
     private bool _isOnGround = false, _canDash = false;
@@ -39,6 +49,8 @@ public class Player : MonoBehaviour
     private Dictionary<string, Color> _colorMultipliers = new();
 
     private Vector3 _spawnPoint;
+
+    private readonly Queue<MessageAction> _messageActions = new();
 
     public bool IsDashUnlocked
     {
@@ -92,21 +104,51 @@ public class Player : MonoBehaviour
     {
         if (_isOnGround) _canDash = true;
 
-        // 이동, 조작 로직
+
+        //테스트코드
+        if (Input.GetKeyDown(KeyCode.K))
+        {
+            ShowSpeech(new MessageAction[] {
+                new MessageAction("나", "안녕하세요", () => { }),
+                new MessageAction("나", "안녕하세요2", () => { }),
+                new MessageAction("나", "안녕하세요3", () => { })
+            });
+        }
+
+        var speechBubble = _speechNextButton.transform.parent.gameObject;
+
+        if (_messageActions.Count > 0 && !speechBubble.activeSelf)
+        {
+            speechBubble.SetActive(true);
+            var message = _messageActions.Peek();
+            _speechNameUI.SetText(message.Name);
+            _speechMessageUI.SetText(message.MessageText);
+            _speechNextButton.onClick.RemoveAllListeners();
+            _speechNextButton.onClick.AddListener(() =>
+            {
+                message.EventAction();
+                speechBubble.SetActive(false);
+                _messageActions.Dequeue();
+            });
+        }
+
         if (!_isSleeping)
         {
-            if (Input.GetButton("Jump") && _jumpCount == _maxJumpCount && _isOnGround)
+            if(!speechBubble.activeSelf)
             {
-                Jump();
-            }
-            else if (Input.GetButtonDown("Jump") && _jumpCount > 0 && _jumpCount < _maxJumpCount)
-            {
-                Jump();
+                if (Input.GetButton("Jump") && _jumpCount == _maxJumpCount && _isOnGround)
+                {
+                    Jump();
+                }
+                else if (Input.GetButtonDown("Jump") && _jumpCount > 0 && _jumpCount < _maxJumpCount)
+                {
+                    Jump();
+                }
+
+                GlidUpdate();
             }
 
-            GlidUpdate();
-
-            var hor = Input.GetAxisRaw("Horizontal");
+            var hor = speechBubble.activeSelf ? 0 : Input.GetAxisRaw("Horizontal");
 
             if (Mathf.Abs(hor) > Mathf.Epsilon)
             {
@@ -138,6 +180,14 @@ public class Player : MonoBehaviour
             _animator.SetBool("IsGliding", false);
         }
 
+        if (speechBubble.activeSelf) // 대화중이라면
+        {
+            if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space))
+            {
+                _speechNextButton.onClick.Invoke();
+            }
+        }
+
         _animator.SetBool("IsSleeping", _isSleeping);
         _animator.SetFloat("JumpVelocity", _rigid.velocity.y);
 
@@ -161,6 +211,14 @@ public class Player : MonoBehaviour
         }
 
         if (transform.position.y < -30f) Sleep();
+    }
+
+    public void ShowSpeech(MessageAction[] actions)
+    {
+        foreach(var action in actions)
+        {
+            _messageActions.Enqueue(action);
+        }
     }
 
     private void DashUpdate(float hor)
@@ -202,6 +260,7 @@ public class Player : MonoBehaviour
     private void GlidUpdate()
     {
         var isGliding = IsGliding;
+        _glidSource.volume = Mathf.Clamp(_glidSource.volume + 0.1f * Time.deltaTime * (isGliding ? 1 : -1), 0f, 0.1f);
         _animator.SetBool("IsGliding", isGliding);
         _rigid.drag = isGliding ? _glidDrag : _originalDrag;
     }
@@ -221,6 +280,7 @@ public class Player : MonoBehaviour
     public void Dash(float dir)
     {
         if (!IsDashUnlocked) return;
+        SoundManager.Instance.Play("Dash", 0.1f, 2.5f);
         _dashRemainCooldown = _dashCooldown;
         _canDash = false;
         _dashTimer = _dashTime;
@@ -242,7 +302,7 @@ public class Player : MonoBehaviour
 
     public void Jump(float force)
     {
-        SoundManager.Instance.Play("Jump", 0.5f, 0.6f);
+        SoundManager.Instance.Play("Jump", 0.3f, 0.6f);
         --_jumpCount;
         _rigid.velocity = Vector2.up * force;
     }
@@ -266,6 +326,7 @@ public class Player : MonoBehaviour
     {
         if (_invincibilityTimer > 0f) return;
         if (_isSleeping) return;
+        SoundManager.Instance.Play("Sleep", 0.1f, 0.8f);
         StartCoroutine(SleepRoutine());
     }
 
@@ -352,5 +413,18 @@ public class Player : MonoBehaviour
     {
         if ((collision.gameObject.layer & _platformLayer) != 0)
             _isOnGround = false;
+    }
+}
+
+public struct MessageAction
+{
+    public readonly string Name, MessageText;
+    public readonly Action EventAction;
+
+    public MessageAction(string name, string text, Action action)
+    {
+        this.Name = name;
+        this.MessageText = text;
+        this.EventAction = action;
     }
 }

@@ -47,3 +47,13 @@ MonoBehaviour:
   _clips:
   - name: Jump
     clip: {fileID: 8300000, guid: 069eb91d59dc92240800fc9222067029, type: 3}
+  - name: Clear
+    clip: {fileID: 8300000, guid: c78a4b9e1af992c4cbfbf7a5252c7d51, type: 3}
+  - name: Dash
+    clip: {fileID: 8300000, guid: ad43a97b9bd133f47b88a67ffe21bcd8, type: 3}
+  - name: Glid
+    clip: {fileID: 8300000, guid: 173514c22574b7548a51bcd2875968f2, type: 3}
+  - name: Sleep
+    clip: {fileID: 8300000, guid: 907bea788eb32964ca8c235eea3428df, type: 3}
+  - name: ButtonClick
+    clip: {fileID: 8300000, guid: 23457257c40962f4c90a1b34f12f42a1, type: 3}
