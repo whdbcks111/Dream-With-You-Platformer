@@ -130,17 +130,6 @@ public class Player : MonoBehaviour
         if (_ending) return;
         if (_isOnGround) _canDash = true;
 
-
-        //테스트코드
-        if (Input.GetKeyDown(KeyCode.K))
-        {
-            ShowSpeech(new MessageAction[] {
-                new("나", "안녕하세요", () => { }),
-                new("나", "안녕하세요2", () => { }),
-                new("나", "안녕하세요3", () => { })
-            });
-        }
-
         var speechBubble = _speechNextButton.transform.parent.gameObject;
 
         if (_messageActions.Count > 0 && !speechBubble.activeSelf)
